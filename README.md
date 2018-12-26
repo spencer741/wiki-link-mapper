@@ -12,5 +12,5 @@ Prompt Order:
 4. Execution
 
 General:
-1.Writes Links to file(s)
-2.Several link revisions may be needed
+1. Writes Links to file(s)
+2. Several link revisions may be needed
