@@ -2,7 +2,6 @@
 #Spencer Arnold
 
 import urllib.request
-import re
 
 #Entry 
 def main():
@@ -24,11 +23,7 @@ def sendReq(root):
     return str(urllib.request.urlopen(root).read())
 
 def parseRaw(haystack):
-    #I suck. Figure out regex
-    needle = r"^href\".*\""
-    pattern = re.compile(needle)
-    print(pattern)
-    print(re.findall(pattern, haystack))
+   
         
     
 if __name__ == '__main__':
