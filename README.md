@@ -14,4 +14,4 @@ Prompt Order:
 General:
 1. Writes Links to file(s)
 2. Several link revisions may be needed
-3. Use regex for finding links
+3. Use ~~regex for finding links~~ Parsing Function
