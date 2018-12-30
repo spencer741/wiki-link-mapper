@@ -11,7 +11,8 @@ def main():
     with open("raw.txt" , "w") as raw:
         raw.write(contents)
         
-    parseRaw()
+    ParseRawUrls()
+    AssembleCompleteUrls()
     
 
 def prompt():
@@ -26,15 +27,13 @@ def sendReq(root):
     
     return str(urllib.request.urlopen(root).read())
 
-def parseRaw():
+def ParseRawUrls():
     #make algorithm cleaner. perhaps general. pass in string and loop through each character for matching or something.
     with open("raw.txt", 'r') as raw:
-        with open("Bare_Urls.txt" , 'w') as bare:
-            
+        with open("Bare_Urls.txt" , 'w') as bare:    
             for char in iter(lambda: raw.read(1), ''):
                 #print("here")
                 if char == 'h':
-                    
                     char = raw.read(1)
                     if char == 'r':
                         char = raw.read(1)
@@ -49,12 +48,33 @@ def parseRaw():
                                     url += char
                                     char = raw.read(1)
                                     #cleans up non wiki related links
-                                if "wiki" in url:
+                                if url.startswith("/wiki/") and ":" not in url:
+                                    isVisited = False
                                     url += '\n'
-                                    bare.write(url)
+                                    with open("Visited_Urls.txt", 'r') as visited:
+                                        vline = visited.readline()
+                                        while vline != '' and isVisited == False:
+                                            if url == vline:
+                                                isVisited = True
+                                            vline = visited.readline()
+                                            
+                                    if(not isVisited):
+                                        with open("Visited_Urls.txt", 'a') as visited:
+                                            visited.write(url)
+                                            bare.write(url)
+                                   
                         
                     
-        
-    
+def AssembleCompleteUrls():
+    with open("Bare_Urls.txt" , 'r') as bare:
+        with open("Complete_Urls.txt", 'a') as complete:
+            
+            for line in iter(bare.readline, ''):
+                
+                if line.startswith("/wiki/"): # and ":" not in line:
+                    makeComplete = "https://en.wikipedia.org"
+                    makeComplete += line
+                    complete.write(makeComplete)
+                
 if __name__ == '__main__':
     main()
