@@ -18,7 +18,7 @@ def main():
 def prompt():
     
     #root page
-    RootUrl input("Please enter root wiki page link: ")
+    RootUrl = input("Please enter root wiki page link: ")
     ArticleDepth = input("Please Enter the article depth you would like to acheive: ")
     return RootUrl, ArticleDepth
     #simplify entry mechanism by abstracting link entry away.
