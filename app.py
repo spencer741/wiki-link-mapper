@@ -6,8 +6,8 @@ import urllib.request
 #Entry 
 def main():
     #This is about to be so bad.
-    
-    contents = sendReq(prompt())
+    RootUrl, ArticleDepth = prompt()
+    contents = sendReq(RootUrl)
     with open("raw.txt" , "w") as raw:
         raw.write(contents)
         
@@ -18,8 +18,9 @@ def main():
 def prompt():
     
     #root page
-    return input("Please enter root wiki page link: ")
-    
+    RootUrl input("Please enter root wiki page link: ")
+    ArticleDepth = input("Please Enter the article depth you would like to acheive: ")
+    return RootUrl, ArticleDepth
     #simplify entry mechanism by abstracting link entry away.
     #Hence the prompt func.
 
