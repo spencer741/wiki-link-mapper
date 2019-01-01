@@ -7,7 +7,7 @@ Non-Graphical Map
 
 Prompt Order:
 1. User specifies core subject desired
-2. User toggles all or no links per page
+2. ~~User toggles all or no links per page~~
 3. User specifiies depth
 4. Execution
 
