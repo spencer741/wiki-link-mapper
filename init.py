@@ -9,8 +9,9 @@ def main():
     #print 'Argument List:', str(sys.argv)
     RootUrl, ArticleDepth = prompt()
     content = sendReq(RootUrl)
-    with open("raw.txt" , "w") as raw:
-        raw.write(content)
+    for level in ArticleDepth:
+        with open("raw.txt" , "w") as raw:
+            raw.write(content)
     test()
 
 def sendReq(requesteduri):
@@ -24,7 +25,7 @@ def prompt():
     ArticleDepth = input("Please Enter the article depth you would like to acheive: ")
     return RootUrl, ArticleDepth
 
-def test():
+def test(depth):
     with open('raw.txt', 'r') as raw:
         data = raw.read()
         soup = BeautifulSoup(data)
@@ -32,10 +33,12 @@ def test():
         for tag in soup.findAll('a', href=True):
             rawURL = tag['href']
             if rawURL.startswith("/wiki/") and ":" not in rawURL:
-                rawURL.strip("/wiki/")
-                print (rawURL);
+                print(rawURL.strip("/wiki/"))
                 count+=1
         print("Urls in page: " , count)
 
 if __name__ == '__main__':
     main()
+
+
+
