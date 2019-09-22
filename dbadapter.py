@@ -1,83 +1,138 @@
-# import the mysql client for python
+#todo: abstract meesy connection code per func.
 
+
+
+# import the mysql client for python
 import pymysql
 
- 
+#Just hardcoded for now, will implement connection pooler handler if implemented on mass scale
 
-# Create a connection object
+databaseServerIP = "127.0.0.1"  # IP address of the MySQL database server
+databaseUserName = "root"       # User name of the database server
+databaseUserPassword = "toortoor"   # Password for the database user
+newDatabaseName = "WikipediaUrls"  # Name of the database that is to be created
+charSet = "utf8mb4"    # Character set
+cusrorType = pymysql.cursors.DictCursor
 
-databaseServerIP            = "127.0.0.1"  # IP address of the MySQL database server
 
-databaseUserName            = "root"       # User name of the database server
+def createdb():
+    # Create a connection object
+    connectionInstance = pymysql.connect(host=databaseServerIP, user=databaseUserName, password=databaseUserPassword,
+    charset=charSet,cursorclass=cusrorType)
 
-databaseUserPassword        = "toortoor"           # Password for the database user
+    try:
 
- 
+        # Create a cursor object
+        cursorInstance = connectionInstance.cursor()  
 
-newDatabaseName             = "NewDatabase" # Name of the database that is to be created
+        # SQL Statement to create a database
+        sqlStatement = "CREATE DATABASE IF NOT EXISTS " + newDatabaseName  
 
-charSet                     = "utf8mb4"     # Character set
+        # Execute the create database SQL statment through the cursor instance
+        cursorInstance.execute(sqlStatement)
 
-cusrorType                  = pymysql.cursors.DictCursor
+        # SQL query string
+        sqlQuery = "SHOW DATABASES"
 
- 
+        # Execute the sqlQuery
+        cursorInstance.execute(sqlQuery)
 
-connectionInstance   = pymysql.connect(host=databaseServerIP, user=databaseUserName, password=databaseUserPassword,
+        #Fetch all the rows
+        databaseList = cursorInstance.fetchall()
 
-                                     charset=charSet,cursorclass=cusrorType)
+        for database in databaseList:
+            print(database)
 
- 
+    except Exception as e:
+        print("Exeception occured:{}".format(e))
 
-try:
+    finally:
+        connectionInstance.close()
 
-    # Create a cursor object
+def buildTables(root):
+    connectionInstance = pymysql.connect(host=databaseServerIP, user=databaseUserName, password=databaseUserPassword,
+    charset=charSet,cursorclass=cusrorType)
+    try:
 
-    cursorInsatnce        = connectionInstance.cursor()                                    
+        # Create a cursor object
+        cursorInstance = connectionInstance.cursor()  
+        #this should be pymysql pyformat to prevent injection...
+        sqlStatement = "use WikipediaUrls;create table computer (UrlId int(50) not null auto_increment primary key,FullUrl varchar(50),SelfKey int(50));" 
 
- 
+        # Execute the create database SQL statment through the cursor instance
+        cursorInstance.execute(sqlStatement)
+    except Exception as e:
+        print("Exeception occured:{}".format(e))
 
-    # SQL Statement to create a database
+    finally:
+        connectionInstance.close()
 
-    sqlStatement            = "CREATE DATABASE "+newDatabaseName  
+def deletetable(table_name):
+    connectionInstance = pymysql.connect(host=databaseServerIP, user=databaseUserName, password=databaseUserPassword,
+    charset=charSet,cursorclass=cusrorType)
+    try:
+        # Create a cursor object
+        cursorInstance = connectionInstance.cursor()  
 
- 
+        sqlStatement = "DROP TABLE %s;"
 
-    # Execute the create database SQL statment through the cursor instance
+        # Execute the create database SQL statment through the cursor instance
+        cursorInstance.execute(sqlStatement, (table_name))
+    except Exception as e:
+        print("Exeception occured:{}".format(e))
 
-    cursorInsatnce.execute(sqlStatement)
+    finally:
+        connectionInstance.close()
 
- 
+def getURL(rootTopic, Key):
+    connectionInstance = pymysql.connect(host=databaseServerIP, user=databaseUserName, password=databaseUserPassword,
+    charset=charSet,cursorclass=cusrorType)
+    try:
+        # Create a cursor object
+        cursorInstance = connectionInstance.cursor()  
 
-    # SQL query string
+        sqlStatement = "SELECT FullUrl FROM %s WHERE UrlId = %s;"
 
-    sqlQuery            = "SHOW DATABASES"
+        # Execute the create database SQL statment through the cursor instance
+        cursorInstance.execute(sqlStatement, (rootTopic, key))
 
- 
+        myresult = cursorInstance.fetchall()
 
-    # Execute the sqlQuery
+        return myresult
+    except Exception as e:
+        print("Exeception occured:{}".format(e))
 
-    cursorInsatnce.execute(sqlQuery)
+    finally:
+        connectionInstance.close()
+        
+    
+#get primary key where Full URL equals x
 
- 
+def update(rootTopic, url, selfkey):
+    connectionInstance = pymysql.connect(host=databaseServerIP, user=databaseUserName, password=databaseUserPassword,
+    charset=charSet,cursorclass=cusrorType)
+    try:
 
-    #Fetch all the rows
+        # Create a cursor object
+        cursorInstance = connectionInstance.cursor()  
 
-    databaseList                = cursorInsatnce.fetchall()
+        sqlStatement = "INSERT INTO %s (FullUrl, SelfKey) VALUES (%s, %s);"
 
- 
+        # Execute the create database SQL statment through the cursor instance
+        cursorInstance.execute(sqlStatement, (rootTopic, url, selfkey))
 
-    for datatbase in databaseList:
+        sqlStatement = "SELECT UrlId FROM %s WHERE FullUrl = %s;"
 
-        print(datatbase)
+        # Execute the create database SQL statment through the cursor instance
+        cursorInstance.execute(sqlStatement, (rootTopic, url))
 
- 
+        myresult = cursorInstance.fetchall()
 
-except Exception as e:
+        return myresult
 
-    print("Exeception occured:{}".format(e))
+    except Exception as e:
+        print("Exeception occured:{}".format(e))
 
- 
-
-finally:
-
-    connectionInstance.close()
+    finally:
+        connectionInstance.close()
+        
