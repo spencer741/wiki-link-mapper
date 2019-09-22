@@ -4,7 +4,6 @@ import urllib.request
 from bs4 import BeautifulSoup
 import dbadapter
 
-
 def main():
     RootUrl, ArticleDepth = prompt()
     

@@ -131,10 +131,6 @@ def update(rootTopic, url, selfkey):
         
 
 
-
-
-
-
 def deletetable(table_name):
     connectionInstance = pymysql.connect(host=databaseServerIP, user=databaseUserName, password=databaseUserPassword,
     charset=charSet,cursorclass=cusrorType)

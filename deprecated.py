@@ -74,7 +74,7 @@ if __name__ == '__main__':
     main()
 
 #old junk
-
+'''
 def recurse(root, url, depth):
     #have a width and a depth. Once the width gets down to zero, decrement depth
     numchildren = getnumchildren(url)
@@ -102,3 +102,4 @@ def recurse(root, url, depth):
         print("MADE IT TO BEGINNING OF RECURSE!!!")
         recurse(root, dbadapter.getURL(root, key), depth)
 
+'''
