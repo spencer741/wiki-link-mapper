@@ -103,13 +103,13 @@ def update(rootTopic, url, selfkey):
         cursorInstance = connectionInstance.cursor()  
         
         sqlStatement = "INSERT INTO {0} (FullUrl, SelfKey) VALUES ('{1}', {2});".format(rootTopic, url, selfkey)
-        print("This is the sql 1: " + sqlStatement)
+        #print("This is the sql 1: " + sqlStatement)
         # Execute the create database SQL statment through the cursor instance
         cursorInstance.execute("USE WikipediaUrls;")
         cursorInstance.execute(sqlStatement)
 
         sqlStatement = "SELECT UrlId FROM {0} WHERE FullUrl = '{1}';".format(rootTopic, url)
-        print("This is the sql 2: " + sqlStatement)
+        #print("This is the sql 2: " + sqlStatement)
 
         # Execute the create database SQL statment through the cursor instance
         cursorInstance.execute("USE WikipediaUrls;")
@@ -120,7 +120,7 @@ def update(rootTopic, url, selfkey):
         myresult = cursorInstance.fetchone()
         y = dict(myresult)
 
-        print ("the result: {}".format(y["UrlId"]))
+        #print ("the result: {}".format(y["UrlId"]))
         return y["UrlId"]
 
     except Exception as e:
