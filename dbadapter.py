@@ -1,5 +1,6 @@
 #todo: abstract meesy connection code per func.
-
+#todo: implement db and table checking before manipulation and creation
+#todo: implement clean db function.
 
 
 # import the mysql client for python
@@ -50,16 +51,16 @@ def createdb():
         connectionInstance.close()
 
 def buildTables(root):
-    connectionInstance = pymysql.connect(host=databaseServerIP, user=databaseUserName, password=databaseUserPassword,
-    charset=charSet,cursorclass=cusrorType)
+    connectionInstance = pymysql.connect(host=databaseServerIP, user=databaseUserName, password=databaseUserPassword,charset=charSet,cursorclass=cusrorType)
     try:
 
         # Create a cursor object
         cursorInstance = connectionInstance.cursor()  
         #this should be pymysql pyformat to prevent injection...
-        sqlStatement = "use WikipediaUrls;create table computer (UrlId int(50) not null auto_increment primary key,FullUrl varchar(50),SelfKey int(50));" 
+        sqlStatement = "create table {} (UrlId int not null auto_increment primary key,FullUrl varchar(50),SelfKey int);".format(root) 
 
         # Execute the create database SQL statment through the cursor instance
+        cursorInstance.execute("USE WikipediaUrls;")
         cursorInstance.execute(sqlStatement)
     except Exception as e:
         print("Exeception occured:{}".format(e))
@@ -67,40 +68,25 @@ def buildTables(root):
     finally:
         connectionInstance.close()
 
-def deletetable(table_name):
+
+
+def getURL(rootTopic, key):
     connectionInstance = pymysql.connect(host=databaseServerIP, user=databaseUserName, password=databaseUserPassword,
     charset=charSet,cursorclass=cusrorType)
     try:
         # Create a cursor object
         cursorInstance = connectionInstance.cursor()  
-
-        sqlStatement = "DROP TABLE %s;"
-
+        
+        sqlStatement = "SELECT FullUrl FROM {0} WHERE UrlId = {1};".format(rootTopic, key)
+        cursorInstance.execute("USE WikipediaUrls;")
         # Execute the create database SQL statment through the cursor instance
-        cursorInstance.execute(sqlStatement, (table_name))
+        cursorInstance.execute(sqlStatement)
+
+        myresult = cursorInstance.fetchone()
+        y = dict(myresult)
+        return y["FullUrl"]
     except Exception as e:
-        print("Exeception occured:{}".format(e))
-
-    finally:
-        connectionInstance.close()
-
-def getURL(rootTopic, Key):
-    connectionInstance = pymysql.connect(host=databaseServerIP, user=databaseUserName, password=databaseUserPassword,
-    charset=charSet,cursorclass=cusrorType)
-    try:
-        # Create a cursor object
-        cursorInstance = connectionInstance.cursor()  
-
-        sqlStatement = "SELECT FullUrl FROM %s WHERE UrlId = %s;"
-
-        # Execute the create database SQL statment through the cursor instance
-        cursorInstance.execute(sqlStatement, (rootTopic, key))
-
-        myresult = cursorInstance.fetchall()
-
-        return myresult
-    except Exception as e:
-        print("Exeception occured:{}".format(e))
+        print("Exeception occured in getURL:{}".format(e))
 
     finally:
         connectionInstance.close()
@@ -115,24 +101,53 @@ def update(rootTopic, url, selfkey):
 
         # Create a cursor object
         cursorInstance = connectionInstance.cursor()  
+        
+        sqlStatement = "INSERT INTO {0} (FullUrl, SelfKey) VALUES ('{1}', {2});".format(rootTopic, url, selfkey)
+        print("This is the sql 1: " + sqlStatement)
+        # Execute the create database SQL statment through the cursor instance
+        cursorInstance.execute("USE WikipediaUrls;")
+        cursorInstance.execute(sqlStatement)
 
-        sqlStatement = "INSERT INTO %s (FullUrl, SelfKey) VALUES (%s, %s);"
+        sqlStatement = "SELECT UrlId FROM {0} WHERE FullUrl = '{1}';".format(rootTopic, url)
+        print("This is the sql 2: " + sqlStatement)
 
         # Execute the create database SQL statment through the cursor instance
-        cursorInstance.execute(sqlStatement, (rootTopic, url, selfkey))
+        cursorInstance.execute("USE WikipediaUrls;")
+        cursorInstance.execute(sqlStatement)
 
-        sqlStatement = "SELECT UrlId FROM %s WHERE FullUrl = %s;"
+        connectionInstance.commit()
 
+        myresult = cursorInstance.fetchone()
+        y = dict(myresult)
+
+        print ("the result: {}".format(y["UrlId"]))
+        return y["UrlId"]
+
+    except Exception as e:
+        print("Exeception occured in update:{}".format(e))
+
+    finally:
+        connectionInstance.close()
+        
+
+
+
+
+
+
+def deletetable(table_name):
+    connectionInstance = pymysql.connect(host=databaseServerIP, user=databaseUserName, password=databaseUserPassword,
+    charset=charSet,cursorclass=cusrorType)
+    try:
+        # Create a cursor object
+        cursorInstance = connectionInstance.cursor()  
+
+        sqlStatement = "DROP TABLE {};".format(table_name)
+        cursorInstance.execute("USE WikipediaUrls;")
         # Execute the create database SQL statment through the cursor instance
-        cursorInstance.execute(sqlStatement, (rootTopic, url))
-
-        myresult = cursorInstance.fetchall()
-
-        return myresult
-
+        cursorInstance.execute(sqlStatement)
     except Exception as e:
         print("Exeception occured:{}".format(e))
 
     finally:
         connectionInstance.close()
-        

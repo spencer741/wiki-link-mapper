@@ -72,3 +72,33 @@ def AssembleCompleteUrls():
                 
 if __name__ == '__main__':
     main()
+
+#old junk
+
+def recurse(root, url, depth):
+    #have a width and a depth. Once the width gets down to zero, decrement depth
+    numchildren = getnumchildren(url)
+    depth-=1
+    if depth == -1:
+        return
+    else:
+        #store parent url in the db. This is so we get a primary key to use as a self-referencing key for all of the children
+        key = dbadapter.update(root, url, 0)
+        #print("this is key: " + key)
+        #send request to parent url to get children
+        content = sendReq(url)
+
+        #parse content and store url with key
+        soup = BeautifulSoup(content)
+
+        print(depth, " PAGE ---------------------------------")
+
+        for tag in soup.findAll('a', href=True):
+            rawURL = tag['href']
+            if rawURL.startswith("/wiki/") and ":" not in rawURL:
+                dbadapter.update(root, rawURL, key)
+                print(rawURL.replace("/wiki/",""))
+        key+=1
+        print("MADE IT TO BEGINNING OF RECURSE!!!")
+        recurse(root, dbadapter.getURL(root, key), depth)
+

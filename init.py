@@ -13,29 +13,29 @@ def main():
     dbadapter.buildTables(RootUrl.replace("https://en.wikipedia.org/wiki/", ""))
     #print(RootUrl.replace("https://en.wikipedia.org/wiki/", ""))
 
-    #recurse(RootUrl.replace("https://en.wikipedia.org/wiki/", ""), RootUrl, ArticleDepth)
-    
+    rec(RootUrl.replace("https://en.wikipedia.org/wiki/", ""), RootUrl, int(ArticleDepth))
 
-def recurse(root, url, depth):
-    if depth == 0:
+def getnumchildren(root):
+    content = sendReq(root)
+    dbadapter.update(root.replace("https://en.wikipedia.org/wiki/", ""), root, 0)
+    soup = BeautifulSoup(content)
+    lst = []
+    for tag in soup.findAll('a', href=True):
+        rawURL = tag['href']
+        if rawURL.startswith("/wiki/") and ":" not in rawURL:
+            lst.append(rawURL)
+    return lst
+
+def rec(root,url,depth):
+    if depth < 0:
         return
     else:
-        #store parent url in the db. This is so we get a primary key to use as a self-referencing key for all of the children
-        key = dbadapter.update(root, url, None)
-
-        #send request to parent url to get children
-        content = sendReq(url)
-
-        #parse content and store url with key
-        soup = BeautifulSoup(content)
-        for tag in soup.findAll('a', href=True):
-            rawURL = tag['href']
-            if rawURL.startswith("/wiki/") and ":" not in rawURL:
-                dbadapter.update(root, rawURL, key)
-                print(rawURL.replace("/wiki/",""))
-        key+=1
-        depth-=1
-        recurse(dbadapter.getURL(root, key), depth)
+        urlkey = dbadapter.update(root, url, 0)
+        childlist = getnumchildren(url)
+        for child in childlist:
+            dbadapter.update(root, child, urlkey)
+            depth -= 1
+            rec(root,child,depth)
 
 def sendReq(requestedurl):
     makeComplete = requestedurl
@@ -45,7 +45,6 @@ def sendReq(requestedurl):
     return str(urllib.request.urlopen(makeComplete).read())
 
 def prompt():
-    
     #root page
     RootUrl = input("Please enter root wiki page link: ")
     ArticleDepth = input("Please Enter the article depth you would like to acheive: ")
