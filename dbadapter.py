@@ -112,6 +112,8 @@ def update(rootTopic, url, selfkey):
         cursorInstance.execute("USE WikipediaUrls;")
         cursorInstance.execute(sqlStatement)
 
+        connectionInstance.commit()
+
         sqlStatement = "SELECT UrlId FROM {0} WHERE FullUrl = '{1}';".format(rootTopic, url)
         #print("This is the sql 2: " + sqlStatement)
 
@@ -119,7 +121,7 @@ def update(rootTopic, url, selfkey):
         cursorInstance.execute("USE WikipediaUrls;")
         cursorInstance.execute(sqlStatement)
 
-        connectionInstance.commit()
+        
 
         myresult = cursorInstance.fetchone()
         y = dict(myresult)
@@ -154,7 +156,7 @@ def isDuplicate(rootTopic, url):
     charset=charSet,cursorclass=cusrorType)
     try:
         cursorInstance = connectionInstance.cursor()  
-        sqlStatement = "SELECT UrlId from {0} where FullUrl = {1}".format(rootTopic,url)
+        sqlStatement = "SELECT UrlId from {0} where FullUrl = '{1}'".format(rootTopic,url)
         cursorInstance.execute("USE WikipediaUrls;")
         cursorInstance.execute(sqlStatement)
         if cursorInstance.fetchone() == None:
@@ -162,7 +164,7 @@ def isDuplicate(rootTopic, url):
         else:
             return True
     except Exception as e:
-        print("Exeception occured:{}".format(e))
+        print("Exeception occured in duplicate:{}".format(e))
 
     finally:
         connectionInstance.close()

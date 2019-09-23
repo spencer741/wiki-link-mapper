@@ -30,8 +30,7 @@ def getchildren(root):
     return lst
 
 def rec(root,url,depth):
-    
-    if depth < 0: #base case
+    if depth == 0: #base case
         return
     else: #recursive case
 
@@ -43,10 +42,12 @@ def rec(root,url,depth):
 
         #if there is a duplicate, don't pursue its children
         if not dbadapter.isDuplicate(root, url):
+            depth -= 1
             #pre-order traverse. Left to right.
             for child in childlist:
-                dbadapter.update(root, child, urlkey)
-                depth -= 1
+                #need to check children duplicates
+                dbadapter.update(root, child, urlkey) 
+                #need to add a db flag if the child has been processed as a parent.
                 rec(root,child,depth)
 
 def sendReq(requestedurl):
