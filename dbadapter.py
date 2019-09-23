@@ -26,11 +26,14 @@ def createdb():
         # Create a cursor object
         cursorInstance = connectionInstance.cursor()  
 
+        print("\n\n")
         # SQL Statement to create a database
         sqlStatement = "CREATE DATABASE IF NOT EXISTS " + newDatabaseName  
 
         # Execute the create database SQL statment through the cursor instance
         cursorInstance.execute(sqlStatement)
+        
+
 
         # SQL query string
         sqlQuery = "SHOW DATABASES"
@@ -40,9 +43,10 @@ def createdb():
 
         #Fetch all the rows
         databaseList = cursorInstance.fetchall()
-
+        print("\n\n====================")
         for database in databaseList:
             print(database)
+        print("=====================\n\n")
 
     except Exception as e:
         print("Exeception occured:{}".format(e))
@@ -57,7 +61,7 @@ def buildTables(root):
         # Create a cursor object
         cursorInstance = connectionInstance.cursor()  
         #this should be pymysql pyformat to prevent injection...
-        sqlStatement = "create table {} (UrlId int not null auto_increment primary key,FullUrl varchar(50),SelfKey int);".format(root) 
+        sqlStatement = "create table {} (UrlId int not null auto_increment primary key,FullUrl varchar(100),SelfKey int);".format(root) 
 
         # Execute the create database SQL statment through the cursor instance
         cursorInstance.execute("USE WikipediaUrls;")
@@ -135,13 +139,28 @@ def deletetable(table_name):
     connectionInstance = pymysql.connect(host=databaseServerIP, user=databaseUserName, password=databaseUserPassword,
     charset=charSet,cursorclass=cusrorType)
     try:
-        # Create a cursor object
         cursorInstance = connectionInstance.cursor()  
-
         sqlStatement = "DROP TABLE {};".format(table_name)
         cursorInstance.execute("USE WikipediaUrls;")
-        # Execute the create database SQL statment through the cursor instance
         cursorInstance.execute(sqlStatement)
+    except Exception as e:
+        print("Exeception occured:{}".format(e))
+
+    finally:
+        connectionInstance.close()
+
+def isDuplicate(rootTopic, url):
+    connectionInstance = pymysql.connect(host=databaseServerIP, user=databaseUserName, password=databaseUserPassword,
+    charset=charSet,cursorclass=cusrorType)
+    try:
+        cursorInstance = connectionInstance.cursor()  
+        sqlStatement = "SELECT UrlId from {0} where FullUrl = {1}".format(rootTopic,url)
+        cursorInstance.execute("USE WikipediaUrls;")
+        cursorInstance.execute(sqlStatement)
+        if cursorInstance.fetchone() == None:
+            return False
+        else:
+            return True
     except Exception as e:
         print("Exeception occured:{}".format(e))
 
