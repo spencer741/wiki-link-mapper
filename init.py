@@ -9,18 +9,20 @@ def main():
 
     dbadapter.createdb() #if not exist capability? Yes.
 
-    if(CleanBeforeExecute == 'Y'):
-        dbadapter.deletetable(RootUrl.replace("https://en.wikipedia.org/wiki/", ""))
-    
-    dbadapter.buildTables(RootUrl.replace("https://en.wikipedia.org/wiki/", ""))
+    rootTopic = RootUrl.replace("https://en.wikipedia.org/wiki/", "")
 
-    rec(RootUrl.replace("https://en.wikipedia.org/wiki/", ""), RootUrl, int(ArticleDepth))
+    if(CleanBeforeExecute == 'Y'):
+        dbadapter.deletetable(rootTopic)
+    
+    dbadapter.buildTables(rootTopic)
+
+    rec(rootTopic, RootUrl.replace("https://en.wikipedia.org", ""), int(ArticleDepth), True)
 
 def getchildren(root):
     content = sendReq(root)
     #head, sep, tail = content.partition('References')
     #create rules to clean wikipedia by stripping out undesirable tags
-    dbadapter.update(root.replace("https://en.wikipedia.org/wiki/", ""), root, 0)
+    #dbadapter.update(root.replace("https://en.wikipedia.org/wiki/", ""), root, 0)
     soup = BeautifulSoup(content, features="html.parser")
     lst = []
     for tag in soup.findAll('a', href=True):
@@ -29,7 +31,7 @@ def getchildren(root):
             lst.append(rawURL)
     return lst
 
-def rec(root,url,depth):
+def rec(root,url,depth,first):
     if depth == 0: #base case
         return
     else: #recursive case
@@ -40,15 +42,17 @@ def rec(root,url,depth):
         #get number of children for child processing
         childlist = getchildren(url)
 
-        #if there is a duplicate, don't pursue its children
-        if not dbadapter.isDuplicate(root, url):
-            depth -= 1
-            #pre-order traverse. Left to right.
-            for child in childlist:
-                #need to check children duplicates
-                dbadapter.update(root, child, urlkey) 
-                #need to add a db flag if the child has been processed as a parent.
-                rec(root,child,depth)
+        #if there is a duplicate, don't pursue its children... right now we are pursuing
+        #them up to the alloted depth...
+       
+        depth -= 1
+        #pre-order traverse. Left to right.
+        for child in childlist:
+            #print("depth: ",depth)
+            dbadapter.update(root, child, urlkey) 
+            rec(root,child,depth,first)
+            #need to check children duplicates
+            #need to add a db flag if the child has been processed as a parent.
 
 def sendReq(requestedurl):
     makeComplete = requestedurl
