@@ -16,7 +16,7 @@ def main():
     
     dbadapter.buildTables(rootTopic)
 
-    rec(rootTopic, RootUrl.replace("https://en.wikipedia.org", ""), int(ArticleDepth), True)
+    rec(rootTopic, RootUrl.replace("https://en.wikipedia.org", ""), int(ArticleDepth), 0)
 
 def getchildren(root):
     content = sendReq(root)
@@ -30,15 +30,16 @@ def getchildren(root):
         if rawURL.startswith("/wiki/") and ":" not in rawURL and "disambiguation" not in rawURL:
             lst.append(rawURL)
     return lst
-
-def rec(root,url,depth,first):
+#this traversal algorithm finds the first path to a leaf of depth n, and then proceeds to do post order traversal all the way up.
+def rec(root,url,depth,parentkey):
     if depth == 0: #base case
         return
     else: #recursive case
-
-        #update parent and obtain key
-        urlkey = dbadapter.update(root, url, 0)
-
+        if(parentkey == 0):
+            #update parent and obtain key
+            urlkey = dbadapter.update(root, url, parentkey)
+        else:
+            urlkey = parentkey
         #get number of children for child processing
         childlist = getchildren(url)
 
@@ -46,11 +47,11 @@ def rec(root,url,depth,first):
         #them up to the alloted depth...
        
         depth -= 1
-        #pre-order traverse. Left to right.
+        #pre-order traverse. Left to right.s
         for child in childlist:
             #print("depth: ",depth)
-            dbadapter.update(root, child, urlkey) 
-            rec(root,child,depth,first)
+            childkey = dbadapter.update(root, child, urlkey) 
+            rec(root,child,depth,childkey)
             #need to check children duplicates
             #need to add a db flag if the child has been processed as a parent.
 
