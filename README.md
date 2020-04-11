@@ -1,4 +1,6 @@
 # WikiLinkMapper
+Note: This repo is not currently being developed / maintained. I haven't worked on the project in months, but will return in the future when my schedule permits.
+
 Creating a link map from Wikipedia Links.
 
 traversal nature is a revision of pre-order.
