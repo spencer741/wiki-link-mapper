@@ -1,6 +1,8 @@
 # WikiLinkMapper
 Note: This repo is not currently being developed / maintained. I haven't worked on the project in months, but will return in the future when my schedule permits.
 
+Wikipedia has a new feature [what links here](https://en.wikipedia.org/wiki/Special:WhatLinksHere/Computer)
+
 Creating a link map from Wikipedia Links.
 
 traversal nature is a revision of pre-order.
