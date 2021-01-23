@@ -1,5 +1,5 @@
 # WikiLinkMapper
-Note: This repo is not currently being developed / maintained. I haven't worked on the project in months, but will return in the future when my schedule permits.
+Archiving. This repo is not currently being developed / maintained.
 
 Wikipedia has a new feature [what links here](https://en.wikipedia.org/wiki/Special:WhatLinksHere/Computer)
 
